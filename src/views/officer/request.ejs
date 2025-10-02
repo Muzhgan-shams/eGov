@@ -1,0 +1,13 @@
+<% layout('layouts/layout',{ user }) -%>
+<h1 class="h5 mb-3">Request <%= item.id %></h1>
+<ul class="list-group mb-3">
+  <li class="list-group-item">Citizen: <strong><%= item.citizen_name %></strong></li>
+  <li class="list-group-item">Service: <%= item.service %></li>
+  <li class="list-group-item">Status: <span class="badge text-bg-secondary"><%= item.status %></span></li>
+  <li class="list-group-item">Submitted: <%= new Date(item.submitted_at).toLocaleString() %></li>
+</ul>
+<form method="post" action="/officer/requests/<%= item.id %>/decision" class="d-flex gap-2">
+  <input type="hidden" name="decision" value="approve" />
+  <button class="btn btn-success" onclick="this.previousElementSibling.value='approve'">Approve</button>
+  <button class="btn btn-danger" onclick="this.previousElementSibling.value='reject'">Reject</button>
+</form>

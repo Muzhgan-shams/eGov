@@ -1,0 +1,56 @@
+<% layout('layouts/layout') -%>
+<h1 class="h4 mb-3">Create Staff User</h1>
+
+<% if (ok === 'created') { %>
+  <div class="alert alert-success">Staff user created.</div>
+<% } else if (ok === 'promoted') { %>
+  <div class="alert alert-success">Existing citizen promoted to staff.</div>
+<% } else if (ok === 'updated') { %>
+  <div class="alert alert-success">Staff role/department updated.</div>
+<% } %>
+<% if (err) { %>
+  <div class="alert alert-danger">Problem creating user: <%= err %></div>
+<% } %>
+
+
+<form method="post" action="/admin/users/new" class="card p-3">
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">Email</label>
+      <input class="form-control" type="email" name="email" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Name</label>
+      <input class="form-control" type="text" name="name" required>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Role</label>
+      <select class="form-select" name="role" required>
+        <option value="OFFICER">OFFICER</option>
+        <option value="DEPT_HEAD">DEPT_HEAD</option>
+        <option value="ADMIN">ADMIN</option>
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Department (required for OFFICER/DEPT_HEAD)</label>
+      <select class="form-select" name="departmentId">
+        <option value="">— None —</option>
+        <% deps.forEach(d => { %>
+          <option value="<%= d.id %>"><%= d.name %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Temp Password (optional)</label>
+      <input class="form-control" type="text" name="password" placeholder="default: changeme123">
+    </div>
+  </div>
+
+  <div class="mt-3 d-flex gap-2">
+    <button class="btn btn-primary">Create</button>
+    <a class="btn btn-outline-secondary" href="/admin">Back</a>
+  </div>
+</form>
