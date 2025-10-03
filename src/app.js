@@ -22,24 +22,27 @@ const apiReq = require('./routes/api.requests');
 
 const app = express();
 
-
-const origins = (process.env.CLIENT_ORIGIN || '')
+const allowed = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
   .split(',')
   .map(s => s.trim())
   .filter(Boolean);
 
 const corsOpts = {
-  origin: function (origin, cb) {
-    // allow same-origin (no Origin header) and listed origins
-    if (!origin || origins.includes(origin)) return cb(null, true);
+  origin(origin, cb) {
+    // allow same-origin (no Origin header) and the whitelisted origins
+    if (!origin || allowed.includes(origin)) return cb(null, true);
     return cb(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization']
+  allowedHeaders: ['Content-Type','Authorization'],
+  optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOpts));
+// Express 5: use '(.*)' instead of '*' for preflight route
+app.options('(.*)', cors(corsOpts));
+
 // make sure preflight never hits auth middleware
 // app.options('*', cors(corsOpts));
 
@@ -71,8 +74,8 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    sameSite: isProd ? 'lax' : 'lax',
-    secure: isProd ? true : false,      // must be true on HTTPS (Render)
+    sameSite: /* isProd ? 'lax' : 'lax' */ none,
+    secure: /* isProd ? true : false */true,      // must be true on HTTPS (Render)
     maxAge: 1000 * 60 * 60 * 8          // 8 hours
   }
 }));
