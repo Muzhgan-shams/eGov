@@ -21,7 +21,7 @@ const apiRef = require('./routes/api.ref');
 const apiReq = require('./routes/api.requests');
 
 const app = express();
-const allowedOrigins = ['http://localhost:5173'];
+const allowedOrigins = [process.env.CLIENT_ORIGIN ||'http://localhost:5173'];
 
 app.use(cors({
   origin: allowedOrigins,
@@ -81,8 +81,8 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    sameSite: /* isProd ? 'lax' : 'lax' */ none,
-    secure: /* isProd ? true : false */true,      // must be true on HTTPS (Render)
+    sameSite: isProd ? 'lax' : 'lax',
+    secure: isProd ? true : false,      // must be true on HTTPS (Render)
     maxAge: 1000 * 60 * 60 * 8          // 8 hours
   }
 }));
