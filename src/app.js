@@ -21,7 +21,7 @@ const apiRef = require('./routes/api.ref');
 const apiReq = require('./routes/api.requests');
 
 const app = express();
-const cors = require('cors');
+
 
 const origins = (process.env.CLIENT_ORIGIN || '')
   .split(',')
