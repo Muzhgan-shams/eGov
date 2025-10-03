@@ -21,27 +21,34 @@ const apiRef = require('./routes/api.ref');
 const apiReq = require('./routes/api.requests');
 
 const app = express();
+const allowedOrigins = ['http://localhost:5173'];
 
-const allowed = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
-  .split(',')
-  .map(s => s.trim())
-  .filter(Boolean);
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true, // cookies or auth headers
+}));
 
-const corsOpts = {
-  origin(origin, cb) {
-    // allow same-origin (no Origin header) and the whitelisted origins
-    if (!origin || allowed.includes(origin)) return cb(null, true);
-    return cb(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization'],
-  optionsSuccessStatus: 204
-};
 
-app.use(cors(corsOpts));
+// const allowed = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
+//   .split(',')
+//   .map(s => s.trim())
+//   .filter(Boolean);
+
+// const corsOpts = {
+//   origin(origin, cb) {
+//     // allow same-origin (no Origin header) and the whitelisted origins
+//     if (!origin || allowed.includes(origin)) return cb(null, true);
+//     return cb(new Error('Not allowed by CORS'));
+//   },
+//   credentials: true,
+//   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+//   allowedHeaders: ['Content-Type','Authorization'],
+//   optionsSuccessStatus: 204
+// };
+
+// app.use(cors(corsOpts));
 // Express 5: use '(.*)' instead of '*' for preflight route
-app.options('(.*)', cors(corsOpts));
+// app.options('(.*)', cors(corsOpts));
 
 // make sure preflight never hits auth middleware
 // app.options('*', cors(corsOpts));
