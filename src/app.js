@@ -21,6 +21,27 @@ const apiRef = require('./routes/api.ref');
 const apiReq = require('./routes/api.requests');
 
 const app = express();
+const cors = require('cors');
+
+const origins = (process.env.CLIENT_ORIGIN || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+
+const corsOpts = {
+  origin: function (origin, cb) {
+    // allow same-origin (no Origin header) and listed origins
+    if (!origin || origins.includes(origin)) return cb(null, true);
+    return cb(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization']
+};
+
+app.use(cors(corsOpts));
+// make sure preflight never hits auth middleware
+app.options('*', cors(corsOpts));
 
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
@@ -30,7 +51,7 @@ app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173', cre
 
 const isProd = process.env.NODE_ENV === 'production';
 
-// When deployed (Render, etc.) you’re behind a proxy:
+// 
 if (isProd) {
   // trust the first proxy so secure cookies & IP work
   // (Render sets X-Forwarded-* headers)
@@ -39,7 +60,7 @@ if (isProd) {
 
 app.use(session({
   store: new pgSession({
-    pool,                    // reuse your pg Pool
+    pool,                    // reuse  pg Pool
     tableName: 'session',     // will auto-create if missing
     createTableIfMissing: true,     // <-- auto-create table on boot
     // schemaName: 'public',        // uncomment if you use a different schema
