@@ -41,7 +41,7 @@ const corsOpts = {
 
 app.use(cors(corsOpts));
 // make sure preflight never hits auth middleware
-app.options('*', cors(corsOpts));
+// app.options('*', cors(corsOpts));
 
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
