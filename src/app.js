@@ -20,6 +20,9 @@ const adminUsersRoutes = require('./routes/admin.users');
 const apiAuth = require('./routes/api.auth');
 const apiRef = require('./routes/api.ref');
 const apiReq = require('./routes/api.requests');
+const apiStaff = require('./routes/api.staff'); // new
+const citizenRoutes = require('./routes/citizen');
+const staffRegisterRoutes = require('./routes/staff.register');
 
 const app = express();
 const isProd = process.env.NODE_ENV === 'production';
@@ -91,15 +94,19 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // ---------- ROUTES ----------
-app.use('/', authRoutes);
-app.use('/admin', adminRoutes);
-app.use('/officer', officerRoutes);
+app.use('/', authRoutes);            // /login, /logout, staff google/local
+app.use('/', staffRegisterRoutes);   // /staff/register (optional self-signup)
+app.use('/citizen', citizenRoutes);  // citizen dashboard, apply, profile
+app.use('/officer', officerRoutes);  // officer inbox, review
+app.use('/admin', adminRoutes);      // admin dashboards
 app.use('/admin/users', adminUsersRoutes);
+
 
 // JSON APIs (citizen + refs + requests)
 app.use('/api/auth', apiAuth);
 app.use('/api', apiRef);
 app.use('/api', apiReq);
+app.use('/api', apiStaff); // new
 
 // ---------- HOME ----------
 app.get('/', (req, res) => {
