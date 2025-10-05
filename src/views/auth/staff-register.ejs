@@ -1,0 +1,33 @@
+<!-- --- path: src/views/auth/staff-register.ejs -->
+<% layout('layouts/layout') -%>
+<h1 class="h4 mb-3">Request Staff Account</h1>
+
+<% if (ok === 'sent') { %>
+  <div class="alert alert-success">Request submitted. Admin will approve your account.</div>
+<% } %>
+<% if (err === 'exists') { %><div class="alert alert-danger">Email already exists.</div><% } %>
+<% if (err === 'missing') { %><div class="alert alert-danger">Please fill required fields.</div><% } %>
+
+<form method="post" action="/staff/register" class="card p-3">
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">Full name</label>
+      <input class="form-control" name="name" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Email</label>
+      <input class="form-control" name="email" type="email" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Job title</label>
+      <input class="form-control" name="jobTitle" placeholder="Officer / Analyst">
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Password</label>
+      <input class="form-control" name="password" type="password" required>
+    </div>
+  </div>
+  <div class="mt-3">
+    <button class="btn btn-primary">Send request</button>
+  </div>
+</form>
