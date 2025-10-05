@@ -1,0 +1,23 @@
+<!-- --- path: src/views/citizen/apply.ejs -->
+<% layout('layouts/layout') -%>
+<h1 class="h4 mb-3">Apply for a service</h1>
+
+<% if (err === 'missing') { %><div class="alert alert-danger">Please choose a service.</div><% } %>
+<% if (ok === 'submitted') { %><div class="alert alert-success">Request submitted.</div><% } %>
+
+<form class="card p-3" method="post" action="/citizen/apply">
+  <div class="mb-3">
+    <label class="form-label">Service</label>
+    <select class="form-select" name="serviceId" required>
+      <option value="">— Select —</option>
+      <% services.forEach(s => { %>
+        <option value="<%= s.id %>"><%= s.department %> — <%= s.name %> (₨ <%= Math.round((s.fee_cents||0)/100) %>)</option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Notes (optional)</label>
+    <textarea class="form-control" name="notes" rows="4" placeholder='e.g. {"extra":"data"}'></textarea>
+  </div>
+  <button class="btn btn-primary">Submit</button>
+</form>
