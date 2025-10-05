@@ -1,12 +1,16 @@
-<% layout('layouts/layout',{ user }) -%>
+<!-- --- path: src/views/admin/dashboard.ejs -->
+<% layout('layouts/layout') -%>
 <h1 class="h4 mb-4">Admin Dashboard</h1>
+
 <a class="btn btn-sm btn-outline-primary mb-3" href="/admin/users/new">+ Create Staff User</a>
+
 <div class="row g-3 mb-4">
   <div class="col-md-3"><div class="card p-3">All: <strong><%= totals.all %></strong></div></div>
   <div class="col-md-3"><div class="card p-3">Submitted: <strong><%= totals.submitted %></strong></div></div>
   <div class="col-md-3"><div class="card p-3">Under Review: <strong><%= totals.underReview %></strong></div></div>
   <div class="col-md-3"><div class="card p-3">Approved: <strong><%= totals.approved %></strong></div></div>
 </div>
+
 <div class="card">
   <div class="card-header">Recent Requests</div>
   <table class="table mb-0">
@@ -14,7 +18,8 @@
     <tbody>
       <% recent.forEach(r=>{ %>
         <tr>
-          <td><%= r.id %></td><td><%= r.citizen_name %></td>
+          <td><%= r.id %></td>
+          <td><%= r.citizen_name %></td>
           <td><%= r.service %></td>
           <td><span class="badge text-bg-secondary"><%= r.status %></span></td>
           <td><%= new Date(r.submitted_at).toLocaleString() %></td>
