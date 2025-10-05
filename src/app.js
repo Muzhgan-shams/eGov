@@ -1,4 +1,5 @@
-// src/app.js (top portion)
+
+// src/app.js
 require('dotenv').config();
 const path = require('path');
 const express = require('express');
@@ -6,123 +7,107 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const ejsMate = require('ejs-mate');
-const passport = require('./passport');
-const adminUsersRoutes = require('./routes/admin.users');
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
+const passport = require('./passport');
 const { pool } = require('./db');
 
-// route imports ...
+// routes
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const officerRoutes = require('./routes/officer');
+const adminUsersRoutes = require('./routes/admin.users');
 const apiAuth = require('./routes/api.auth');
 const apiRef = require('./routes/api.ref');
 const apiReq = require('./routes/api.requests');
 
 const app = express();
-const allowedOrigins = [process.env.CLIENT_ORIGIN ||'http://localhost:5173'];
+const isProd = process.env.NODE_ENV === 'production';
 
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true, // cookies or auth headers
-}));
+// ---------- PROXY ----------
+if (isProd) app.set('trust proxy', 1);
 
+// ---------- CORS (single mount; Express 5-compatible) ----------
+const allowed = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
 
-// const allowed = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
-//   .split(',')
-//   .map(s => s.trim())
-//   .filter(Boolean);
+const corsOpts = {
+  origin(origin, cb) {
+    // allow same-origin (no Origin header) and whitelisted origins
+    if (!origin || allowed.includes(origin)) return cb(null, true);
+    return cb(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization'],
+  optionsSuccessStatus: 204,
+};
 
-// const corsOpts = {
-//   origin(origin, cb) {
-//     // allow same-origin (no Origin header) and the whitelisted origins
-//     if (!origin || allowed.includes(origin)) return cb(null, true);
-//     return cb(new Error('Not allowed by CORS'));
-//   },
-//   credentials: true,
-//   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-//   allowedHeaders: ['Content-Type','Authorization'],
-//   optionsSuccessStatus: 204
-// };
+app.use(cors(corsOpts));
+app.options('(.*)', cors(corsOpts)); // Express 5 needs (.*) instead of *
 
-// app.use(cors(corsOpts));
-// Express 5: use '(.*)' instead of '*' for preflight route
-// app.options('(.*)', cors(corsOpts));
-
-// make sure preflight never hits auth middleware
-// app.options('*', cors(corsOpts));
-
+// ---------- COMMON MIDDLEWARE ----------
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cookieParser());
-// app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173', credentials: true }));
+app.use(cookieParser(process.env.COOKIE_SECRET || 'dev_cookie'));
 
-const isProd = process.env.NODE_ENV === 'production';
-
-// 
-if (isProd) {
-  // trust the first proxy so secure cookies & IP work
-  // (Render sets X-Forwarded-* headers)
-  app.set('trust proxy', 1);
-}
-
+// ---------- SESSION (staff/admin via passport) ----------
 app.use(session({
   store: new pgSession({
-    pool,                    // reuse  pg Pool
-    tableName: 'session',     // will auto-create if missing
-    createTableIfMissing: true,     // <-- auto-create table on boot
-    // schemaName: 'public',        // uncomment if you use a different schema
+    pool,
+    tableName: 'session',
+    createTableIfMissing: true,
   }),
-  name: 'connect.sid',       // default; keep consistent
+  name: 'connect.sid',
   secret: process.env.SESSION_SECRET || 'dev_secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    sameSite: isProd ? 'lax' : 'lax',
-    secure: isProd ? true : false,      // must be true on HTTPS (Render)
-    maxAge: 1000 * 60 * 60 * 8          // 8 hours
-  }
+    // If you will access from a different origin (e.g. Vercel client), you need SameSite=None + secure in prod.
+    sameSite: isProd ? 'none' : 'lax',
+    secure:   isProd ? true  : false,
+    maxAge: 1000 * 60 * 60 * 8, // 8h
+  },
 }));
+
+// ---------- PASSPORT ----------
 app.use(passport.initialize());
 app.use(passport.session());
 
-// User available to all tempaltes
+// expose user to all templates
 app.use((req, res, next) => {
   res.locals.user = req.user || null;
   next();
 });
 
-// ejs-mate view engine + views dir
+// ---------- VIEWS / STATIC ----------
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-// static + routes 
 app.use('/public', express.static(path.join(__dirname, 'public')));
+
+// ---------- ROUTES ----------
 app.use('/', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/officer', officerRoutes);
+app.use('/admin/users', adminUsersRoutes);
+
+// JSON APIs (citizen + refs + requests)
 app.use('/api/auth', apiAuth);
 app.use('/api', apiRef);
 app.use('/api', apiReq);
-app.use('/admin/users', adminUsersRoutes);
 
-
+// ---------- HOME ----------
 app.get('/', (req, res) => {
   if (req.user?.role === 'ADMIN') return res.redirect('/admin');
   if (req.user?.role === 'OFFICER' || req.user?.role === 'DEPT_HEAD') return res.redirect('/officer');
-
-  // If somehow a citizen session exists on the staff app, clear it instead of redirect looping
-  if (req.user) {
-    const done = () => res.redirect('/login');
-    return req.logout ? req.logout(done) : req.session.destroy(done);
-  }
   return res.redirect('/login');
 });
 
-
+// ---------- START ----------
 const port = +process.env.PORT || 3000;
-app.listen(port, () => console.log(`Server: http://localhost:${port}`));
+app.listen(port, () => console.log(`Server listening on :${port}`));
