@@ -1,0 +1,17 @@
+<!-- --- path: src/views/admin/reports.ejs -->
+<% layout('layouts/layout') -%>
+<h1 class="h4 mb-3">Reports</h1>
+
+<table class="table table-striped">
+  <thead><tr><th>Department</th><th>Total</th><th>Approved</th><th>Rejected</th></tr></thead>
+  <tbody>
+    <% rows.forEach(r => { %>
+      <tr>
+        <td><%= r.department %></td>
+        <td><%= r.total %></td>
+        <td><%= r.approved %></td>
+        <td><%= r.rejected %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
