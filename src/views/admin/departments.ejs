@@ -1,0 +1,26 @@
+<!-- --- path: src/views/admin/departments.ejs -->
+<% layout('layouts/layout') -%>
+<h1 class="h4 mb-3">Departments</h1>
+
+<% if (ok) { %><div class="alert alert-success">Saved.</div><% } %>
+
+<form class="card p-3 mb-3" method="post" action="/admin/departments">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-6">
+      <label class="form-label">Department name</label>
+      <input class="form-control" name="name" required>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-primary w-100">Add</button>
+    </div>
+  </div>
+</form>
+
+<table class="table table-striped">
+  <thead><tr><th>ID</th><th>Name</th></tr></thead>
+  <tbody>
+    <% rows.forEach(d => { %>
+      <tr><td><%= d.id %></td><td><%= d.name %></td></tr>
+    <% }) %>
+  </tbody>
+</table>
