@@ -1,23 +1,17 @@
-<!doctype html><html><head>
-<meta charset="utf-8"/>
-<title><%= title || 'Staff' %></title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="/public/css/style.css" rel="stylesheet">
+<!-- --- path: src/views/layouts/layout.ejs -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title><%= title || 'eGov' %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/public/css/style.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-<nav class="navbar navbar-expand-lg bg-white shadow-sm mb-3">
-  <div class="container">
-    <a class="navbar-brand" href="/">Gov Staff</a>
-    <div class="ms-auto">
-      <% if (user) { %>
-        <span class="me-2">Hi, <strong><%= user.name %></strong> (<%= user.role %>)</span>
-        <form class="d-inline" action="/logout" method="post">
-          <button class="btn btn-outline-secondary btn-sm">Logout</button>
-        </form>
-      <% } %>
-    </div>
-  </div>
-</nav>
-<main class="container"><%- body %></main>
+  <%- include('layouts/_nav') %>
+  <main class="container py-4">
+    <%- body %>
+  </main>
 </body>
 </html>
