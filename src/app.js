@@ -30,26 +30,10 @@ const isProd = process.env.NODE_ENV === 'production';
 // ---------- PROXY ----------
 if (isProd) app.set('trust proxy', 1);
 
-// ---------- CORS (single mount; Express 5-compatible) ----------
-const allowed = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
-  .split(',')
-  .map(s => s.trim())
-  .filter(Boolean);
-
-const corsOpts = {
-  origin(origin, cb) {
-    // allow same-origin (no Origin header) and whitelisted origins
-    if (!origin || allowed.includes(origin)) return cb(null, true);
-    return cb(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization'],
-  optionsSuccessStatus: 204,
-};
-
-app.use(cors(corsOpts));
-app.options('(.*)', cors(corsOpts)); // Express 5 needs (.*) instead of *
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 
 // ---------- COMMON MIDDLEWARE ----------
 app.use(morgan('dev'));
