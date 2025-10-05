@@ -1,0 +1,21 @@
+<!-- --- path: src/views/citizen/dashboard.ejs -->
+<% layout('layouts/layout') -%>
+<h1 class="h4 mb-3">Citizen Dashboard</h1>
+
+<a class="btn btn-primary mb-3" href="/citizen/apply">+ Apply for new service</a>
+
+<table class="table table-striped">
+  <thead><tr><th>ID</th><th>Department</th><th>Service</th><th>Status</th><th>Submitted</th><th></th></tr></thead>
+  <tbody>
+    <% rows.forEach(r => { %>
+      <tr>
+        <td><%= r.id %></td>
+        <td><%= r.department %></td>
+        <td><%= r.service %></td>
+        <td><span class="badge text-bg-secondary"><%= r.status %></span></td>
+        <td><%= new Date(r.submitted_at).toLocaleString() %></td>
+        <td><a class="btn btn-sm btn-outline-primary" href="/citizen/requests/<%= r.id %>">View</a></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
