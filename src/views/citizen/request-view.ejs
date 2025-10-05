@@ -1,0 +1,16 @@
+<!-- --- path: src/views/citizen/request-view.ejs -->
+<% layout('layouts/layout') -%>
+<h1 class="h5 mb-3">Request #<%= r.id %></h1>
+
+<ul class="list-group mb-3">
+  <li class="list-group-item">Service: <strong><%= r.service %></strong> — <%= r.department %></li>
+  <li class="list-group-item">Status: <span class="badge text-bg-secondary"><%= r.status %></span></li>
+  <li class="list-group-item">Submitted: <%= new Date(r.submitted_at).toLocaleString() %></li>
+</ul>
+
+<% if (r.status === 'SUBMITTED') { %>
+  <form method="post" action="/api/requests/<%= r.id %>/payments" class="d-inline">
+    <button class="btn btn-success">Simulate Payment</button>
+  </form>
+<% } %>
+<a class="btn btn-outline-secondary" href="/citizen">Back</a>
