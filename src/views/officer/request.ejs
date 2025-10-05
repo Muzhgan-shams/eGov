@@ -1,7 +1,8 @@
-<% layout('layouts/layout',{ user }) -%>
+<!-- --- path: src/views/officer/request.ejs -->
+<% layout('layouts/layout') -%>
 <h1 class="h5 mb-3">Request <%= item.id %></h1>
 <ul class="list-group mb-3">
-  <li class="list-group-item">Citizen: <strong><%= item.citizen_name %></strong></li>
+  <li class="list-group-item">Citizen: <strong><%= item.citizen_name %></strong> (<%= item.citizen_email %>)</li>
   <li class="list-group-item">Service: <%= item.service %></li>
   <li class="list-group-item">Status: <span class="badge text-bg-secondary"><%= item.status %></span></li>
   <li class="list-group-item">Submitted: <%= new Date(item.submitted_at).toLocaleString() %></li>
