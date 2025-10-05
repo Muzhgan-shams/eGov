@@ -1,0 +1,43 @@
+<!-- --- path: src/views/admin/services.ejs -->
+<% layout('layouts/layout') -%>
+<h1 class="h4 mb-3">Services</h1>
+
+<% if (ok) { %><div class="alert alert-success">Saved.</div><% } %>
+
+<form class="card p-3 mb-3" method="post" action="/admin/services">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label">Department</label>
+      <select class="form-select" name="department_id" required>
+        <% deps.forEach(d => { %>
+          <option value="<%= d.id %>"><%= d.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Service name</label>
+      <input class="form-control" name="name" required>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Fee (cents)</label>
+      <input class="form-control" name="fee_cents" type="number" min="0" value="0">
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-primary w-100">Add</button>
+    </div>
+  </div>
+</form>
+
+<table class="table table-striped">
+  <thead><tr><th>ID</th><th>Department</th><th>Service</th><th>Fee</th></tr></thead>
+  <tbody>
+    <% rows.forEach(s => { %>
+      <tr>
+        <td><%= s.id %></td>
+        <td><%= s.department %></td>
+        <td><%= s.name %></td>
+        <td>₨ <%= Math.round((s.fee_cents||0)/100) %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
