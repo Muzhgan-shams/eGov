@@ -1,0 +1,42 @@
+<!-- --- path: src/views/auth/register.ejs -->
+<% layout('layouts/layout') -%>
+<h1 class="h4 mb-3">Create your citizen account</h1>
+
+<% if (err === 'missing') { %><div class="alert alert-danger">Please fill required fields.</div><% } %>
+<% if (err === 'exists') { %><div class="alert alert-danger">Email already registered.</div><% } %>
+
+<form method="post" action="/register" class="card p-3">
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">Full name</label>
+      <input class="form-control" name="name" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Email</label>
+      <input class="form-control" name="email" type="email" required>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">National ID</label>
+      <input class="form-control" name="nationalId">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Date of birth</label>
+      <input class="form-control" name="dateOfBirth" type="date">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Phone</label>
+      <input class="form-control" name="phone">
+    </div>
+    <div class="col-12">
+      <label class="form-label">Address</label>
+      <input class="form-control" name="address">
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Password</label>
+      <input class="form-control" name="password" type="password" required>
+    </div>
+  </div>
+  <div class="mt-3">
+    <button class="btn btn-primary">Create account</button>
+  </div>
+</form>
