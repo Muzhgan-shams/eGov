@@ -88,6 +88,7 @@ router.post('/register', async (req, res) => {
     });
     return res.redirect('/citizen');
   } catch {
+    console.error('REGISTER FAIL:', e.code, e.detail || e.message);
     return res.redirect('/register?err=fail');
   }
 });
