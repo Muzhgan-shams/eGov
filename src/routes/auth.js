@@ -87,7 +87,7 @@ router.post('/register', async (req, res) => {
       maxAge: 1000 * 60 * 60 * 24 * 7
     });
     return res.redirect('/citizen');
-  } catch {
+  } catch(e) {
     console.error('REGISTER FAIL:', e.code, e.detail || e.message);
     return res.redirect('/register?err=fail');
   }
