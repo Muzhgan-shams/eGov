@@ -1,42 +1,39 @@
-<!-- --- path: src/views/auth/login.ejs -->
 <% layout('layouts/layout') -%>
 <div class="row justify-content-center">
-  <div class="col-md-5">
-    <h1 class="h4 mb-3">Staff Sign in</h1>
+  <div class="col-12 col-md-6 col-lg-5 border border-success rounded shadow-sm p-3 bg-white">
+    <h1 class="h4 mb-3 text-black">Sign in</h1>
 
-    <% if (ok === 'registered') { %>
-      <div class="alert alert-success">Account created. Please sign in.</div>
-    <% } %>
     <% if (err === '1') { %>
-      <div class="alert alert-danger">Login failed</div>
-    <% } %>
-    <% if (err === 'staff_only') { %>
-      <div class="alert alert-warning">Please sign in as staff (admin/officer) or use the citizen site.</div>
+      <div class="alert alert-danger">Invalid email or password.</div>
     <% } %>
     <% if (err === 'auth') { %>
       <div class="alert alert-warning">Please sign in.</div>
     <% } %>
-    <% if (err === 'not_active') { %>
-      <div class="alert alert-warning">Your staff account is not active yet.</div>
+    <% if (err === 'staff_only') { %>
+      <div class="alert alert-warning">Staff only. Use citizen login instead.</div>
     <% } %>
+    <% if (err === 'use_staff_google') { %>
+  <div class="alert alert-info">
+    Please sign in using <strong>“Continue with Google (Staff)”</strong>.
+  </div>
+   <% } %>
 
-    <form method="post" action="/login" class="card p-3 mb-3">
-      <div class="mb-2">
-        <label class="form-label">Email</label>
-        <input class="form-control" type="email" name="email" required placeholder="admin@gov.local">
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input class="form-control" type="password" name="password" required placeholder="••••••••">
-      </div>
-      <button class="btn btn-primary w-100">Login with Email</button>
+
+    <form method="post" action="/login" class="card bg-dark text-light border-light p-3 mb-3">
+      <label class="form-label text-light">Email</label>
+      <input class="form-control bg-dark text-light border-light mb-2" type="email" name="email" required>
+
+      <label class="form-label text-light">Password</label>
+      <input class="form-control bg-dark text-light border-light mb-3" type="password" name="password" required>
+
+      <button class="btn btn-success w-100">Sign in (Staff)</button>
     </form>
 
-    <a class="btn btn-outline-dark w-100 mb-3" href="/auth/google">Continue with Google</a>
+    <a class="btn btn-outline-secondary w-100 mb-2" href="/auth/google">Continue with Google (Staff)</a>
+    <a class="btn btn-outline-secondary w-100" href="/auth/google-citizen">Continue with Google (Citizen)</a>
 
-    <div class="text-center">
-      <a href="/register">New citizen? Create account</a><br/>
-      <a href="/staff/register">Staff? Request account</a>
+    <div class="text-center mt-3 text-black">
+      Don’t have an account? <a href="/register">Register as Citizen</a>
     </div>
   </div>
 </div>

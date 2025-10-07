@@ -1,29 +1,15 @@
-
 // src/db.js
 const { Pool } = require('pg');
 
-const {
-  DATABASE_URL,
-  PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD,
-} = process.env;
-
-let pool;
-
-if (DATABASE_URL) {
-  pool = new Pool({
-    connectionString: DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-  });
-} else {
-  pool = new Pool({
-    host: PGHOST || 'localhost',
-    port: +(PGPORT || 5432),
-    database: PGDATABASE || 'eGov',
-    user: PGUSER || 'postgres',
-    password: PGPASSWORD || '',
-    ssl: false,
-  });
-}
+const pool = process.env.DATABASE_URL
+  ? new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
+  : new Pool({
+      host: process.env.PGHOST || 'localhost',
+      port: +(process.env.PGPORT || 5432),
+      database: process.env.PGDATABASE || 'eGov',
+      user: process.env.PGUSER || 'postgres',
+      password: process.env.PGPASSWORD || '',
+    });
 
 module.exports = {
   pool,

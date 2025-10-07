@@ -1,73 +1,75 @@
-
-// src/app.js
+// --- keep your existing requires ---
 require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
-const cors = require('cors');
-const ejsMate = require('ejs-mate');
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
-const passport = require('./passport');
-const { pool } = require('./db');
+const ejsMate = require('ejs-mate');
 
-// routes
+const passport = require('./passport');
+const { pool, query } = require('./db');
+
 const authRoutes = require('./routes/auth');
-const adminRoutes = require('./routes/admin');
-const officerRoutes = require('./routes/officer');
-const adminUsersRoutes = require('./routes/admin.users');
-const apiAuth = require('./routes/api.auth');
-const apiRef = require('./routes/api.ref');
-const apiReq = require('./routes/api.requests');
-const apiStaff = require('./routes/api.staff'); // new
 const citizenRoutes = require('./routes/citizen');
-const staffRegisterRoutes = require('./routes/staff.register');
+const officerRoutes = require('./routes/officer');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const isProd = process.env.NODE_ENV === 'production';
-
-// ---------- PROXY ----------
+const secret = process.env.SESSION_SECRET || 'dev_secret';
 if (isProd) app.set('trust proxy', 1);
 
-app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true
-}));
-
-// ---------- COMMON MIDDLEWARE ----------
+// ---------- CORE MIDDLEWARE (order matters) ----------
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cookieParser(process.env.COOKIE_SECRET || 'dev_cookie'));
+app.use(cookieParser(secret)); // <-- signed cookies support
 
-// ---------- SESSION (staff/admin via passport) ----------
 app.use(session({
-  store: new pgSession({
-    pool,
-    tableName: 'session',
-    createTableIfMissing: true,
-  }),
+  store: new pgSession({ pool, tableName: 'session', createTableIfMissing: true }),
   name: 'connect.sid',
-  secret: process.env.SESSION_SECRET || 'dev_secret',
+  secret,
   resave: false,
   saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    // If you will access from a different origin (e.g. Vercel client), you need SameSite=None + secure in prod.
-    sameSite: isProd ? 'none' : 'lax',
-    secure:   isProd ? true  : false,
-    maxAge: 1000 * 60 * 60 * 8, // 8h
-  },
+  cookie: { httpOnly:true, sameSite:'lax', secure:isProd, maxAge: 1000*60*60*8 }
 }));
-
-// ---------- PASSPORT ----------
 app.use(passport.initialize());
 app.use(passport.session());
 
-// expose user to all templates
-app.use((req, res, next) => {
+// ---------- ATTACH CITIZEN/LOCALS (this was missing) ----------
+app.use(async (req, res, next) => {
+  // start with staff user, if any
   res.locals.user = req.user || null;
+
+  // if not staff, try citizen cookie
+  if (!req.user) {
+    const cid = req.signedCookies?.cid || req.cookies?.cid;
+    if (cid) {
+      try {
+        const { rows } = await query(
+          `SELECT id, email, role, name, avatar_url FROM users WHERE id=$1 AND role='CITIZEN'`,
+          [cid]
+        );
+        if (rows[0]) {
+          req.citizen = rows[0];
+          res.locals.user = rows[0]; // so navbar shows citizen too
+        }
+      } catch (_) { /* ignore */ }
+    }
+  }
+
+  // defaults so EJS never throws
+  res.locals.hideNav = res.locals.hideNav ?? false;
+  res.locals.ok = res.locals.ok ?? null;
+  res.locals.err = res.locals.err ?? null;
+  next();
+});
+
+// ---------- (optional) DEBUG LOGGER — put AFTER attach so values are accurate ----------
+app.use((req, res, next) => {
+  console.log('[', req.method, req.path, ']', 'user=', !!req.user, 'citizen=', !!req.citizen);
   next();
 });
 
@@ -76,29 +78,23 @@ app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // ---------- ROUTES ----------
-app.use('/', authRoutes);            // /login, /logout, staff google/local
-app.use('/', staffRegisterRoutes);   // /staff/register (optional self-signup)
-app.use('/citizen', citizenRoutes);  // citizen dashboard, apply, profile
-app.use('/officer', officerRoutes);  // officer inbox, review
-app.use('/admin', adminRoutes);      // admin dashboards
-app.use('/admin/users', adminUsersRoutes);
+app.use('/', authRoutes);
+app.use('/citizen', citizenRoutes);
+app.use('/officer', officerRoutes);
+app.use('/admin', adminRoutes);
 
-
-// JSON APIs (citizen + refs + requests)
-app.use('/api/auth', apiAuth);
-app.use('/api', apiRef);
-app.use('/api', apiReq);
-app.use('/api', apiStaff); // new
-
-// ---------- HOME ----------
+// ---------- SMART HOME ----------
 app.get('/', (req, res) => {
-  if (req.user?.role === 'ADMIN') return res.redirect('/admin');
-  if (req.user?.role === 'OFFICER' || req.user?.role === 'DEPT_HEAD') return res.redirect('/officer');
+  if (req.user) {
+    if (req.user.role === 'ADMIN') return res.redirect('/admin');
+    if (['OFFICER','DEPT_HEAD'].includes(req.user.role)) return res.redirect('/officer');
+  }
+  if (req.citizen) return res.redirect('/citizen');
   return res.redirect('/login');
 });
 
-// ---------- START ----------
 const port = +process.env.PORT || 3000;
-app.listen(port, () => console.log(`Server listening on :${port}`));
+app.listen(port, () => console.log(`http://localhost:${port}`));

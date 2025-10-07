@@ -1,17 +1,32 @@
-<!-- --- path: src/views/admin/reports.ejs -->
 <% layout('layouts/layout') -%>
-<h1 class="h4 mb-3">Reports</h1>
+<h1 class="h4 mb-3 text-black">Reports</h1>
 
-<table class="table table-striped">
-  <thead><tr><th>Department</th><th>Total</th><th>Approved</th><th>Rejected</th></tr></thead>
-  <tbody>
-    <% rows.forEach(r => { %>
-      <tr>
-        <td><%= r.department %></td>
-        <td><%= r.total %></td>
-        <td><%= r.approved %></td>
-        <td><%= r.rejected %></td>
-      </tr>
-    <% }) %>
-  </tbody>
-</table>
+<div class="card bg-dark text-light border-light p-3 mb-4">
+  <div>Total revenue (simulated): <strong>$<%= totalMoney.toFixed(2) %></strong></div>
+</div>
+
+<div class="card bg-dark border-light">
+  <div class="card-header text-light">Requests by Department</div>
+  <div class="table-responsive">
+    <table class="table table-dark table-hover table-bordered mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Department</th>
+          <th>Total</th>
+          <th>Approved</th>
+          <th>Rejected</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% perDept.forEach(r => { %>
+          <tr>
+            <td><%= r.department %></td>
+            <td><%= r.total %></td>
+            <td><%= r.approved %></td>
+            <td><%= r.rejected %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

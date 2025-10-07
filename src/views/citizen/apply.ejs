@@ -1,23 +1,24 @@
-<!-- --- path: src/views/citizen/apply.ejs -->
 <% layout('layouts/layout') -%>
-<h1 class="h4 mb-3">Apply for a service</h1>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6 border border-success rounded shadow-sm p-3 bg-white">
+    <h1 class="h4 mb-3 text-dark">Apply for a service</h1>
 
-<% if (err === 'missing') { %><div class="alert alert-danger">Please choose a service.</div><% } %>
-<% if (ok === 'submitted') { %><div class="alert alert-success">Request submitted.</div><% } %>
-
-<form class="card p-3" method="post" action="/citizen/apply">
-  <div class="mb-3">
-    <label class="form-label">Service</label>
-    <select class="form-select" name="serviceId" required>
-      <option value="">— Select —</option>
-      <% services.forEach(s => { %>
-        <option value="<%= s.id %>"><%= s.department %> — <%= s.name %> (₨ <%= Math.round((s.fee_cents||0)/100) %>)</option>
-      <% }) %>
-    </select>
+    <form class="card bg-dark text-light border-light p-3" method="post" action="/citizen/apply">
+      <div class="mb-3">
+        <label class="form-label text-light">Service</label>
+        <select class="form-select bg-dark text-light border-light" name="serviceId" required>
+          <% services.forEach(s => { %>
+            <option value="<%= s.id %>">
+              <%= s.department %> — <%= s.name %> (<%= (s.fee_cents || 0) / 100 %> USD)
+            </option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label text-light">Notes</label>
+        <textarea class="form-control bg-dark text-light border-light" name="notes" placeholder='Your Note ......'></textarea>
+      </div>
+      <button class="btn btn-success w-100">Submit</button>
+    </form>
   </div>
-  <div class="mb-3">
-    <label class="form-label">Notes (optional)</label>
-    <textarea class="form-control" name="notes" rows="4" placeholder='e.g. {"extra":"data"}'></textarea>
-  </div>
-  <button class="btn btn-primary">Submit</button>
-</form>
+</div>

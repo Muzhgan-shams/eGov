@@ -1,16 +1,47 @@
-<!-- --- path: src/views/citizen/request-view.ejs -->
 <% layout('layouts/layout') -%>
-<h1 class="h5 mb-3">Request #<%= r.id %></h1>
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-10 border border-success rounded shadow-sm p-3 bg-white">
+    <h1 class="h5 mb-3 text-dark">Request #<%= r.id %></h1>
 
-<ul class="list-group mb-3">
-  <li class="list-group-item">Service: <strong><%= r.service %></strong> — <%= r.department %></li>
-  <li class="list-group-item">Status: <span class="badge text-bg-secondary"><%= r.status %></span></li>
-  <li class="list-group-item">Submitted: <%= new Date(r.submitted_at).toLocaleString() %></li>
-</ul>
+    <ul class="list-group mb-4">
+      <li class="list-group-item">Service: <%= r.service %> — <%= r.department %></li>
+      <li class="list-group-item">Status: <span class="badge bg-secondary"><%= r.status %></span></li>
+      <li class="list-group-item">Submitted: <%= new Date(r.submitted_at).toLocaleString() %></li>
+    </ul>
 
-<% if (r.status === 'SUBMITTED') { %>
-  <form method="post" action="/api/requests/<%= r.id %>/payments" class="d-inline">
-    <button class="btn btn-success">Simulate Payment</button>
-  </form>
-<% } %>
-<a class="btn btn-outline-secondary" href="/citizen">Back</a>
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <div class="card bg-dark text-light border-light p-3 h-100">
+          <h2 class="h6 text-light">Upload document</h2>
+          <form method="post" enctype="multipart/form-data" action="/citizen/requests/<%= r.id %>/doc">
+            <input class="form-control bg-dark text-light border-light mb-2" type="file" name="file" required>
+            <button class="btn btn-outline-light w-100">Upload</button>
+          </form>
+          <hr class="border-light">
+          <h2 class="h6 text-light">Documents</h2>
+          <ul class="list-unstyled">
+            <% (docs || []).forEach(d => { %>
+              <li>📄 <%= d.file_name %> <small class="text-muted">(<%= d.mime_type %>)</small></li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <div class="card bg-dark text-light border-light p-3 h-100">
+          <h2 class="h6 text-light">Payment</h2>
+          <form method="post" action="/citizen/requests/<%= r.id %>/pay">
+            <button class="btn btn-success w-100">Simulate Payment</button>
+          </form>
+          <hr class="border-light">
+          <h2 class="h6 text-light">Payments</h2>
+          <ul class="list-unstyled">
+            <% (pays || []).forEach(p => { %>
+              <li>💳 <%= (p.amount_cents || 0) / 100 %> — <%= p.status %> <small class="text-muted">(<%= new Date(p.paid_at).toLocaleString() %>)</small></li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

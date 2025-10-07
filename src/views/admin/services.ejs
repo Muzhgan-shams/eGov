@@ -1,43 +1,61 @@
-<!-- --- path: src/views/admin/services.ejs -->
 <% layout('layouts/layout') -%>
-<h1 class="h4 mb-3">Services</h1>
+<h1 class="h4 mb-3 text-black">Services</h1>
 
-<% if (ok) { %><div class="alert alert-success">Saved.</div><% } %>
+<% if (ok === 'created') { %>
+  <div class="alert alert-success">Created.</div>
+<% } %>
+<% if (err) { %>
+  <div class="alert alert-danger">Error: <%= err %></div>
+<% } %>
 
-<form class="card p-3 mb-3" method="post" action="/admin/services">
-  <div class="row g-2 align-items-end">
-    <div class="col-md-4">
-      <label class="form-label">Department</label>
-      <select class="form-select" name="department_id" required>
+<form class="card bg-dark text-light border-light p-3 mb-4" method="post" action="/admin/services">
+  <div class="row g-3">
+    <div class="col-12 col-md-3">
+      <select class="form-select bg-dark text-light border-light" name="department_id" required>
+        <option value="">Department…</option>
         <% deps.forEach(d => { %>
           <option value="<%= d.id %>"><%= d.name %></option>
         <% }) %>
       </select>
     </div>
-    <div class="col-md-4">
-      <label class="form-label">Service name</label>
-      <input class="form-control" name="name" required>
+    <div class="col-12 col-md-3">
+      <input class="form-control bg-dark text-light border-light" name="name" placeholder="Service name" required>
     </div>
-    <div class="col-md-2">
-      <label class="form-label">Fee (cents)</label>
-      <input class="form-control" name="fee_cents" type="number" min="0" value="0">
+    <div class="col-12 col-md-4">
+      <input class="form-control bg-dark text-light border-light" name="descr" placeholder="Description">
     </div>
-    <div class="col-md-2">
-      <button class="btn btn-primary w-100">Add</button>
+    <div class="col-6 col-md-1">
+      <input class="form-control bg-dark text-light border-light" name="fee_cents" placeholder="Fee (¢)" inputmode="numeric">
+    </div>
+    <div class="col-6 col-md-1">
+      <button class="btn btn-success w-100">Add</button>
     </div>
   </div>
 </form>
 
-<table class="table table-striped">
-  <thead><tr><th>ID</th><th>Department</th><th>Service</th><th>Fee</th></tr></thead>
-  <tbody>
-    <% rows.forEach(s => { %>
-      <tr>
-        <td><%= s.id %></td>
-        <td><%= s.department %></td>
-        <td><%= s.name %></td>
-        <td>₨ <%= Math.round((s.fee_cents||0)/100) %></td>
-      </tr>
-    <% }) %>
-  </tbody>
-</table>
+<div class="card bg-dark border-light">
+  <div class="table-responsive">
+    <table class="table table-dark table-hover table-bordered mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Department</th>
+          <th>Name</th>
+          <th>Fee</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.forEach(s => { %>
+          <tr>
+            <td><%= s.id %></td>
+            <td><%= s.department %></td>
+            <td><%= s.name %></td>
+            <td><%= (s.fee_cents || 0) / 100 %></td>
+            <td><%= s.descr || '' %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,43 +1,43 @@
-<!-- --- path: src/views/admin/users.ejs -->
 <% layout('layouts/layout') -%>
-<h1 class="h4 mb-3">Users</h1>
+<h1 class="h4 mb-3 text-light">Users</h1>
 
-<% if (ok === 'approved') { %><div class="alert alert-success">User approved.</div><% } %>
-<% if (ok === 'disabled') { %><div class="alert alert-success">User disabled.</div><% } %>
+<form class="row g-3 mb-4">
+  <div class="col-12 col-md-4 col-lg-3">
+    <select class="form-select bg-dark text-light border-light" name="role" onchange="this.form.submit()">
+      <option value="">All roles</option>
+      <option value="CITIZEN" <%= role === 'CITIZEN' ? 'selected' : '' %>>CITIZEN</option>
+      <option value="OFFICER" <%= role === 'OFFICER' ? 'selected' : '' %>>OFFICER</option>
+      <option value="DEPT_HEAD" <%= role === 'DEPT_HEAD' ? 'selected' : '' %>>DEPT_HEAD</option>
+      <option value="ADMIN" <%= role === 'ADMIN' ? 'selected' : '' %>>ADMIN</option>
+    </select>
+  </div>
+</form>
 
-<table class="table table-striped align-middle">
-  <thead>
-    <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Dept</th><th>Actions</th></tr>
-  </thead>
-  <tbody>
-    <% users.forEach(u => { %>
-      <tr>
-        <td><%= u.id %></td>
-        <td><%= u.name || '—' %></td>
-        <td><%= u.email %></td>
-        <td><span class="badge text-bg-secondary"><%= u.role %></span></td>
-        <td><%= u.status %></td>
-        <td><%= u.department_id || '—' %></td>
-        <td>
-          <form class="d-inline" method="post" action="/admin/users/<%= u.id %>/approve">
-            <select class="form-select form-select-sm d-inline w-auto me-1" name="role">
-              <option<%= u.role==='OFFICER'?' selected':'' %>>OFFICER</option>
-              <option<%= u.role==='DEPT_HEAD'?' selected':'' %>>DEPT_HEAD</option>
-              <option<%= u.role==='ADMIN'?' selected':'' %>>ADMIN</option>
-            </select>
-            <select class="form-select form-select-sm d-inline w-auto me-1" name="department_id">
-              <option value="">— Dept —</option>
-              <% deps.forEach(d => { %>
-                <option value="<%= d.id %>" <%= (u.department_id===d.id)?'selected':'' %>><%= d.name %></option>
-              <% }) %>
-            </select>
-            <button class="btn btn-sm btn-primary">Approve/Save</button>
-          </form>
-          <form class="d-inline" method="post" action="/admin/users/<%= u.id %>/disable">
-            <button class="btn btn-sm btn-outline-danger">Disable</button>
-          </form>
-        </td>
-      </tr>
-    <% }) %>
-  </tbody>
-</table>
+<div class="card bg-dark border-light">
+  <div class="table-responsive">
+    <table class="table table-dark table-hover table-bordered mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Email</th>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Dept</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.forEach(u => { %>
+          <tr>
+            <td><%= u.id %></td>
+            <td><%= u.email %></td>
+            <td><%= u.name || '' %></td>
+            <td><span class="badge bg-secondary"><%= u.role %></span></td>
+            <td><%= u.department_id || '' %></td>
+            <td><%= u.status || '' %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

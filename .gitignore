@@ -56,3 +56,6 @@ jspm_packages/
 
 # Misc
 *.tgz
+
+# Ignore the schema file
+schema.sql

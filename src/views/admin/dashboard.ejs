@@ -1,30 +1,67 @@
-<!-- --- path: src/views/admin/dashboard.ejs -->
 <% layout('layouts/layout') -%>
-<h1 class="h4 mb-4">Admin Dashboard</h1>
+<h1 class="h4 mb-4 text-black">Admin Dashboard</h1>
 
-<a class="btn btn-sm btn-outline-primary mb-3" href="/admin/users/new">+ Create Staff User</a>
-
-<div class="row g-3 mb-4">
-  <div class="col-md-3"><div class="card p-3">All: <strong><%= totals.all %></strong></div></div>
-  <div class="col-md-3"><div class="card p-3">Submitted: <strong><%= totals.submitted %></strong></div></div>
-  <div class="col-md-3"><div class="card p-3">Under Review: <strong><%= totals.underReview %></strong></div></div>
-  <div class="col-md-3"><div class="card p-3">Approved: <strong><%= totals.approved %></strong></div></div>
+<div class="mb-3 d-flex flex-wrap gap-2">
+  <a class="btn btn-outline-success btn-sm" href="/admin/users">Users</a>
+  <a class="btn btn-outline-success btn-sm" href="/admin/departments">Departments</a>
+  <a class="btn btn-outline-success btn-sm" href="/admin/services">Services</a>
+  <a class="btn btn-outline-success btn-sm" href="/admin/reports">Reports</a>
+  <a class="btn btn-outline-success btn-sm" href="/admin/users/new">+ New Staff</a>
 </div>
 
-<div class="card">
-  <div class="card-header">Recent Requests</div>
-  <table class="table mb-0">
-    <thead><tr><th>ID</th><th>Citizen</th><th>Service</th><th>Status</th><th>Submitted</th></tr></thead>
-    <tbody>
-      <% recent.forEach(r=>{ %>
+<a class="btn btn-sm btn-success mb-3" href="/admin/users/new">+ Create Staff User</a>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card bg-dark text-light text-center p-3 border-light h-100">
+      <div>All</div>
+      <strong><%= totals.all %></strong>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card bg-dark text-light text-center p-3 border-light h-100">
+      <div>Submitted</div>
+      <strong><%= totals.submitted %></strong>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card bg-dark text-light text-center p-3 border-light h-100">
+      <div>Under Review</div>
+      <strong><%= totals.underReview %></strong>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card bg-dark text-light text-center p-3 border-light h-100">
+      <div>Approved</div>
+      <strong><%= totals.approved %></strong>
+    </div>
+  </div>
+</div>
+
+<div class="card bg-dark border-light">
+  <div class="card-header text-light">Recent Requests</div>
+  <div class="table-responsive">
+    <table class="table table-dark table-hover table-bordered mb-0">
+      <thead class="table-light">
         <tr>
-          <td><%= r.id %></td>
-          <td><%= r.citizen_name %></td>
-          <td><%= r.service %></td>
-          <td><span class="badge text-bg-secondary"><%= r.status %></span></td>
-          <td><%= new Date(r.submitted_at).toLocaleString() %></td>
+          <th>ID</th>
+          <th>Citizen</th>
+          <th>Service</th>
+          <th>Status</th>
+          <th>Submitted</th>
         </tr>
-      <% }) %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% recent.forEach(r => { %>
+          <tr>
+            <td><%= r.id %></td>
+            <td><%= r.citizen_name %></td>
+            <td><%= r.service %></td>
+            <td><span class="badge bg-secondary"><%= r.status %></span></td>
+            <td><%= new Date(r.submitted_at).toLocaleString() %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
 </div>

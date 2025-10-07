@@ -1,21 +1,49 @@
-<!-- --- path: src/views/citizen/dashboard.ejs -->
 <% layout('layouts/layout') -%>
-<h1 class="h4 mb-3">Citizen Dashboard</h1>
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-10 border border-success rounded shadow-sm p-3 bg-white">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
+      <h1 class="h4 mb-2 mb-md-0 text-dark">Citizen Dashboard</h1>
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-success" href="/citizen/apply">+ Apply for new service</a>
+        <form method="post" action="/citizen/logout">
+          <button class="btn btn-outline-dark">Logout</button>
+        </form>
+      </div>
+    </div>
 
-<a class="btn btn-primary mb-3" href="/citizen/apply">+ Apply for new service</a>
+    <h2 class="h6 text-uppercase text-muted">Your requests</h2>
 
-<table class="table table-striped">
-  <thead><tr><th>ID</th><th>Department</th><th>Service</th><th>Status</th><th>Submitted</th><th></th></tr></thead>
-  <tbody>
-    <% rows.forEach(r => { %>
-      <tr>
-        <td><%= r.id %></td>
-        <td><%= r.department %></td>
-        <td><%= r.service %></td>
-        <td><span class="badge text-bg-secondary"><%= r.status %></span></td>
-        <td><%= new Date(r.submitted_at).toLocaleString() %></td>
-        <td><a class="btn btn-sm btn-outline-primary" href="/citizen/requests/<%= r.id %>">View</a></td>
-      </tr>
-    <% }) %>
-  </tbody>
-</table>
+    <% if (!rows || rows.length === 0) { %>
+      <div class="alert alert-info">No requests yet. Click “Apply for new service”.</div>
+    <% } else { %>
+      <div class="card bg-dark border-light">
+        <div class="table-responsive">
+          <table class="table table-dark table-hover table-bordered mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>ID</th>
+                <th>Department</th>
+                <th>Service</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% rows.forEach(r => { %>
+                <tr>
+                  <td><%= r.id %></td>
+                  <td><%= r.department %></td>
+                  <td><%= r.service %></td>
+                  <td><span class="badge bg-secondary"><%= r.status %></span></td>
+                  <td><%= new Date(r.submitted_at).toLocaleString() %></td>
+                  <td><a class="btn btn-sm btn-outline-light" href="/citizen/requests/<%= r.id %>">View</a></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>

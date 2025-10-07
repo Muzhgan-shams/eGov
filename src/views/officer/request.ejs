@@ -1,14 +1,31 @@
-<!-- --- path: src/views/officer/request.ejs -->
 <% layout('layouts/layout') -%>
-<h1 class="h5 mb-3">Request <%= item.id %></h1>
-<ul class="list-group mb-3">
-  <li class="list-group-item">Citizen: <strong><%= item.citizen_name %></strong> (<%= item.citizen_email %>)</li>
-  <li class="list-group-item">Service: <%= item.service %></li>
-  <li class="list-group-item">Status: <span class="badge text-bg-secondary"><%= item.status %></span></li>
-  <li class="list-group-item">Submitted: <%= new Date(item.submitted_at).toLocaleString() %></li>
-</ul>
-<form method="post" action="/officer/requests/<%= item.id %>/decision" class="d-flex gap-2">
-  <input type="hidden" name="decision" value="approve" />
-  <button class="btn btn-success" onclick="this.previousElementSibling.value='approve'">Approve</button>
-  <button class="btn btn-danger" onclick="this.previousElementSibling.value='reject'">Reject</button>
-</form>
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8 border border-success rounded shadow-sm p-3 bg-white">
+    <h1 class="h5 mb-3 text-dark">Request #<%= item.id %></h1>
+
+    <ul class="list-group mb-4">
+      <li class="list-group-item">Citizen: <strong><%= item.citizen_name %></strong></li>
+      <li class="list-group-item">Service: <%= item.service %></li>
+      <li class="list-group-item">Status: <span class="badge bg-secondary"><%= item.status %></span></li>
+      <li class="list-group-item">Submitted: <%= new Date(item.submitted_at).toLocaleString() %></li>
+    </ul>
+
+    <div class="card bg-dark text-light border-light p-3 mb-4">
+      <h2 class="h6 text-light">Documents</h2>
+      <ul class="list-unstyled mb-0">
+        <% (docs || []).forEach(d => { %>
+          <li>📄 <%= d.file_name %></li>
+        <% }) %>
+      </ul>
+    </div>
+
+    <div class="card bg-dark text-light border-light p-3">
+      <h2 class="h6 text-light mb-3">Decision</h2>
+      <form method="post" action="/officer/requests/<%= item.id %>/decision" class="d-flex flex-wrap gap-2">
+        <input type="hidden" name="decision" value="approve"/>
+        <button class="btn btn-success" onclick="this.previousElementSibling.value='approve'">Approve</button>
+        <button class="btn btn-danger" onclick="this.previousElementSibling.value='reject'">Reject</button>
+      </form>
+    </div>
+  </div>
+</div>
